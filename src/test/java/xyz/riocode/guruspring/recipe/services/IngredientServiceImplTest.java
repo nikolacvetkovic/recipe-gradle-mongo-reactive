@@ -6,7 +6,6 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import reactor.core.publisher.Mono;
 import xyz.riocode.guruspring.recipe.commands.IngredientCommand;
-import xyz.riocode.guruspring.recipe.commands.UnitOfMeasureCommand;
 import xyz.riocode.guruspring.recipe.converters.IngredientCommandToIngredient;
 import xyz.riocode.guruspring.recipe.converters.IngredientToIngredientCommand;
 import xyz.riocode.guruspring.recipe.converters.UnitOfMeasureCommandToUnitOfMeasure;
@@ -14,14 +13,16 @@ import xyz.riocode.guruspring.recipe.converters.UnitOfMeasureToUnitOfMeasureComm
 import xyz.riocode.guruspring.recipe.domain.Ingredient;
 import xyz.riocode.guruspring.recipe.domain.Recipe;
 import xyz.riocode.guruspring.recipe.repositories.RecipeRepository;
-import xyz.riocode.guruspring.recipe.repositories.UnitOfMeasureRepository;
 import xyz.riocode.guruspring.recipe.repositories.reactive.RecipeReactiveRepository;
+import xyz.riocode.guruspring.recipe.repositories.reactive.UnitOfMeasureReactiveRepository;
 
 import java.util.Optional;
 
 import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
 public class IngredientServiceImplTest {
 
@@ -32,7 +33,7 @@ public class IngredientServiceImplTest {
     RecipeReactiveRepository recipeReactiveRepository;
 
     @Mock
-    UnitOfMeasureRepository unitOfMeasureRepository;
+    UnitOfMeasureReactiveRepository unitOfMeasureRepository;
 
     IngredientToIngredientCommand ingredientToIngredientCommand;
     IngredientCommandToIngredient ingredientCommandToIngredient;
@@ -46,7 +47,7 @@ public class IngredientServiceImplTest {
         MockitoAnnotations.initMocks(this);
         ingredientToIngredientCommand = new IngredientToIngredientCommand(new UnitOfMeasureToUnitOfMeasureCommand());
         ingredientCommandToIngredient = new IngredientCommandToIngredient(new UnitOfMeasureCommandToUnitOfMeasure());
-        ingredientService = new IngredientServiceImpl(recipeReactiveRepository, recipeRepository, ingredientToIngredientCommand, ingredientCommandToIngredient, unitOfMeasureRepository);
+        ingredientService = new IngredientServiceImpl(recipeRepository, recipeReactiveRepository, ingredientToIngredientCommand, ingredientCommandToIngredient, unitOfMeasureRepository);
         recipe = new Recipe();
         recipe.setId("1");
     }
@@ -65,7 +66,7 @@ public class IngredientServiceImplTest {
         ingredient3.setId("3");
         recipe.addIngredient(ingredient3);
 
-        when(recipeRepository.findById(anyString())).thenReturn(Optional.of(recipe));
+        when(recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(recipe));
 
         IngredientCommand ingredientCommand = ingredientService.findByRecipeIdAndIngredientId("1", "2").block();
 
