@@ -50,7 +50,7 @@ public class ImageController {
     @GetMapping(value = "/recipe/{recipeId}/recipeimage", produces = MediaType.IMAGE_JPEG_VALUE)
     public void getRecipeImage(@PathVariable String recipeId, HttpServletResponse response) throws IOException {
 
-        Recipe recipe = recipeService.findById(recipeId);
+        Recipe recipe = recipeService.findById(recipeId).block();
         //todo check image exists
 
         if(recipe.getImage() == null){

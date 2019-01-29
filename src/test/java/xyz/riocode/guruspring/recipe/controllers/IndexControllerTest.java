@@ -9,11 +9,12 @@ import org.mockito.MockitoAnnotations;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.ui.Model;
+import reactor.core.publisher.Flux;
 import xyz.riocode.guruspring.recipe.domain.Recipe;
 import xyz.riocode.guruspring.recipe.services.RecipeService;
 
 import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.eq;
@@ -59,9 +60,9 @@ public class IndexControllerTest {
         recipe.setId("1");
         recipes.add(recipe);
 
-        when(recipeService.getRecipes()).thenReturn(recipes);
+        when(recipeService.getRecipes()).thenReturn(Flux.fromIterable(recipes));
 
-        ArgumentCaptor<Set<Recipe>> argumentCaptor = ArgumentCaptor.forClass(Set.class);
+        ArgumentCaptor<Flux<Recipe>> argumentCaptor = ArgumentCaptor.forClass(Flux.class);
         //when
         String viewName = indexController.indexPage(model);
 
@@ -69,7 +70,8 @@ public class IndexControllerTest {
         assertEquals("index", viewName);
         verify(recipeService, Mockito.times(1)).getRecipes();
         verify(model, times(1)).addAttribute(eq("recipes"), argumentCaptor.capture());
-        Set<Recipe> setInController = argumentCaptor.getValue();
+        Flux<Recipe> fluxController = argumentCaptor.getValue();
+        List<Recipe> setInController = fluxController.collectList().block();
         assertEquals(2, setInController.size());
     }
 }

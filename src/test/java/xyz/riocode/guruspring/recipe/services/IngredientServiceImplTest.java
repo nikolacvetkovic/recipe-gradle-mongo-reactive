@@ -16,8 +16,6 @@ import xyz.riocode.guruspring.recipe.repositories.RecipeRepository;
 import xyz.riocode.guruspring.recipe.repositories.reactive.RecipeReactiveRepository;
 import xyz.riocode.guruspring.recipe.repositories.reactive.UnitOfMeasureReactiveRepository;
 
-import java.util.Optional;
-
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
@@ -80,21 +78,19 @@ public class IngredientServiceImplTest {
         ingredientCommand.setId("5");
         ingredientCommand.setRecipeId("1");
 
-        Optional<Recipe> recipeOptional = Optional.of(new Recipe());
-
         Recipe savedRecipe = new Recipe();
         Ingredient ingredient = new Ingredient();
         ingredient.setId("5");
         savedRecipe.addIngredient(ingredient);
 
-        when(recipeRepository.findById(anyString())).thenReturn(Optional.of(new Recipe()));
-        when(recipeRepository.save(any())).thenReturn(savedRecipe);
+        when(recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(new Recipe()));
+        when(recipeReactiveRepository.save(any())).thenReturn(Mono.just(savedRecipe));
 
         IngredientCommand savedIngredientCommand = ingredientService.saveIngredientCommand(ingredientCommand).block();
 
         assertEquals("5", savedIngredientCommand.getId());
-        verify(recipeRepository).findById(anyString());
-        verify(recipeRepository).save(any(Recipe.class));
+        verify(recipeReactiveRepository).findById(anyString());
+        verify(recipeReactiveRepository).save(any(Recipe.class));
 
     }
 
@@ -134,11 +130,12 @@ public class IngredientServiceImplTest {
         ingredient.setId("3");
         recipe.addIngredient(ingredient);
 
-        when(recipeRepository.findById(anyString())).thenReturn(Optional.of(recipe));
+        when(recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(recipe));
+        when(recipeReactiveRepository.save(any())).thenReturn(Mono.just(recipe));
 
         ingredientService.deleteIngredientById("1", "3");
 
-        verify(recipeRepository).findById(anyString());
-        verify(recipeRepository).save(any(Recipe.class));
+        verify(recipeReactiveRepository).findById(anyString());
+        verify(recipeReactiveRepository).save(any(Recipe.class));
     }
 }

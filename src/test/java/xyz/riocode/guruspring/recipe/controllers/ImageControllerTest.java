@@ -9,6 +9,7 @@ import org.springframework.mock.web.MockHttpServletResponse;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import reactor.core.publisher.Mono;
 import xyz.riocode.guruspring.recipe.commands.RecipeCommand;
 import xyz.riocode.guruspring.recipe.domain.Recipe;
 import xyz.riocode.guruspring.recipe.services.ImageService;
@@ -55,7 +56,7 @@ public class ImageControllerTest {
         RecipeCommand recipeCommand = new RecipeCommand();
         recipeCommand.setId("1");
 
-        when(recipeService.findCommandById(any())).thenReturn(recipeCommand);
+        when(recipeService.findCommandById(any())).thenReturn(Mono.just(recipeCommand));
 
         mockMvc.perform(get("/recipe/1/image"))
                 .andExpect(status().isOk())
@@ -91,7 +92,7 @@ public class ImageControllerTest {
 
         recipe.setImage(image);
 
-        when(recipeService.findById(any())).thenReturn(recipe);
+        when(recipeService.findById(any())).thenReturn(Mono.just(recipe));
 
         MockHttpServletResponse response = mockMvc.perform(get("/recipe/1/recipeimage"))
                 .andExpect(status().isOk())

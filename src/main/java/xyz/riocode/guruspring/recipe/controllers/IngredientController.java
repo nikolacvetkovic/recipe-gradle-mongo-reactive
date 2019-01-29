@@ -31,7 +31,7 @@ public class IngredientController {
     @GetMapping("/recipe/{recipeId}/ingredients")
     public String listIngredients(@PathVariable String recipeId, Model model){
 
-        model.addAttribute("recipe", recipeService.findCommandById(recipeId));
+        model.addAttribute("recipe", recipeService.findCommandById(recipeId).block());
 
         return "recipe/ingredient/list";
     }
@@ -54,7 +54,7 @@ public class IngredientController {
     @GetMapping("recipe/{recipeId}/ingredient/new")
     public String getNewIngredientForm(@PathVariable String recipeId, Model model){
 
-        RecipeCommand recipeCommand = recipeService.findCommandById(recipeId);
+        RecipeCommand recipeCommand = recipeService.findCommandById(recipeId).block();
         //todo raise exception if null
 
         IngredientCommand ingredientCommand = new IngredientCommand();

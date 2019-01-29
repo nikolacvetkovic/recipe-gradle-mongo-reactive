@@ -3,12 +3,9 @@ package xyz.riocode.guruspring.recipe.domain;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.data.annotation.Id;
-import org.springframework.data.mongodb.core.mapping.DBRef;
 import org.springframework.data.mongodb.core.mapping.Document;
 
-import java.util.ArrayList;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Getter
@@ -25,10 +22,7 @@ public class Recipe {
     private Integer servings;
     private String source;
     private String url;
-
-
     private String directions;
-
 
     private Byte[] image;
 
@@ -38,7 +32,6 @@ public class Recipe {
 
     private Difficulty difficulty;
 
-    @DBRef
     private Set<Category> categories = new HashSet<>();
 
 

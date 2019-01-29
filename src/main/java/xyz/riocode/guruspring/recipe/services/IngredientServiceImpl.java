@@ -83,13 +83,13 @@ public class IngredientServiceImpl implements IngredientService {
     @Transactional
     @Override
     public Mono<IngredientCommand> saveIngredientCommand(IngredientCommand ingredientCommand) {
-        Optional<Recipe> recipeOptional = recipeRepository.findById(ingredientCommand.getRecipeId());
+        Recipe recipe = recipeReactiveRepository.findById(ingredientCommand.getRecipeId()).block();
 
-        if(!recipeOptional.isPresent()){
+        if(recipe == null){
             // todo throw error if not found
             return Mono.just(new IngredientCommand());
         } else {
-            Recipe recipe = recipeOptional.get();
+
             Optional<Ingredient> ingredientOptional = recipe.getIngredients().stream()
                                     .filter(ingredient -> ingredient.getId().equals(ingredientCommand.getId()))
                                     .findFirst();
@@ -106,7 +106,7 @@ public class IngredientServiceImpl implements IngredientService {
                 recipe.addIngredient(ingredient);
             }
 
-            Recipe savedRecipe = recipeRepository.save(recipe);
+            Recipe savedRecipe = recipeReactiveRepository.save(recipe).block();
 
             Optional<Ingredient> savedIngredientOptional = savedRecipe.getIngredients().stream()
                     .filter(recipeIngredients -> recipeIngredients.getId().equals(ingredientCommand.getId()))
@@ -131,11 +131,10 @@ public class IngredientServiceImpl implements IngredientService {
     }
 
     public Mono<Void> deleteIngredientById(String recipeId, String ingredientId){
-        Optional<Recipe> recipeOptional = recipeRepository.findById(recipeId);
-        if(!recipeOptional.isPresent()){
+        Recipe recipe = recipeReactiveRepository.findById(recipeId).block();
+        if(recipe == null){
 
         } else {
-            Recipe recipe = recipeOptional.get();
 
             Optional<Ingredient> ingredientOptional = recipe.getIngredients().stream()
                                     .filter(ingredient -> ingredient.getId().equals(ingredientId))
@@ -144,7 +143,7 @@ public class IngredientServiceImpl implements IngredientService {
                 Ingredient ingredient = ingredientOptional.get();
                 //ingredient.setRecipe(null);
                 recipe.getIngredients().remove(ingredient);
-                recipeRepository.save(recipe);
+                recipeReactiveRepository.save(recipe).block();
             }
         }
         return Mono.empty();
