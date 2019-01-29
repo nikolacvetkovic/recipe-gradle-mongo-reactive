@@ -1,14 +1,14 @@
 package xyz.riocode.guruspring.recipe.controllers;
 
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.servlet.ModelAndView;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
 import xyz.riocode.guruspring.recipe.commands.RecipeCommand;
-import xyz.riocode.guruspring.recipe.exceptions.NotFoundException;
 import xyz.riocode.guruspring.recipe.services.RecipeService;
 
 import javax.validation.Valid;
@@ -63,15 +63,15 @@ public class RecipeController {
         return "redirect:/";
     }
 
-    @ResponseStatus(HttpStatus.NOT_FOUND)
-    @ExceptionHandler(NotFoundException.class)
-    public ModelAndView handleNotFound(Exception ex){
-        log.error("handling not found exception");
-        log.error(ex.getMessage());
-        ModelAndView modelAndView = new ModelAndView();
-        modelAndView.addObject("exception", ex);
-        modelAndView.setViewName("404error");
-
-        return modelAndView;
-    }
+//    @ResponseStatus(HttpStatus.NOT_FOUND)
+//    @ExceptionHandler(NotFoundException.class)
+//    public ModelAndView handleNotFound(Exception ex){
+//        log.error("handling not found exception");
+//        log.error(ex.getMessage());
+//        ModelAndView modelAndView = new ModelAndView();
+//        modelAndView.addObject("exception", ex);
+//        modelAndView.setViewName("404error");
+//
+//        return modelAndView;
+//    }
 }
