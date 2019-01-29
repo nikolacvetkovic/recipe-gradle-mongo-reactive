@@ -8,28 +8,28 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.multipart.MultipartFile;
+import reactor.core.publisher.Mono;
 import xyz.riocode.guruspring.recipe.domain.Recipe;
-import xyz.riocode.guruspring.recipe.repositories.RecipeRepository;
+import xyz.riocode.guruspring.recipe.repositories.reactive.RecipeReactiveRepository;
 
 import java.io.IOException;
-import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 public class ImageServiceImplTest {
 
     @Mock
-    RecipeRepository recipeRepository;
+    RecipeReactiveRepository recipeReactiveRepository;
 
     ImageServiceImpl imageService;
 
     @Before
     public void setUp() throws Exception {
         MockitoAnnotations.initMocks(this);
-        imageService = new ImageServiceImpl(recipeRepository);
+        imageService = new ImageServiceImpl(recipeReactiveRepository);
     }
 
     @Test
@@ -40,7 +40,8 @@ public class ImageServiceImplTest {
         Recipe recipe = new Recipe();
         recipe.setId(id);
 
-        when(recipeRepository.findById(any())).thenReturn(Optional.of(recipe));
+        when(recipeReactiveRepository.findById(anyString())).thenReturn(Mono.just(recipe));
+        when(recipeReactiveRepository.save(any(Recipe.class))).thenReturn(Mono.just(recipe));
 
         ArgumentCaptor<Recipe> argumentCaptor = ArgumentCaptor.forClass(Recipe.class);
 
@@ -48,7 +49,7 @@ public class ImageServiceImplTest {
         imageService.saveImageFile(id, multipartFile);
 
         //then
-        verify(recipeRepository).save(argumentCaptor.capture());
+        verify(recipeReactiveRepository).save(argumentCaptor.capture());
         Recipe savedRecipe = argumentCaptor.getValue();
         Assert.assertEquals(multipartFile.getBytes().length, savedRecipe.getImage().length);
 
